@@ -1,12 +1,10 @@
-```markdown
 # 🐍 XML-RPC Buldozer
 
-M
 ## 🔍 What's XML-RPC?
 
 WordPress exposes an API called `XML-RPC` via the endpoint:
 
-```
+```bash
 https://target.com/xmlrpc.php
 ```
 
@@ -18,9 +16,10 @@ It supports a special method:
 system.multicall
 ```
 
-Which allows multiple method calls in a **single XML request** — ideal for bruteforce attacks.
+Which allows multiple method calls in a **single XML request** — ideal for bruteforce attacks, since you can craft a single request that test thousands of passwords (meaning that you can bypass WAF for example).
 
----
+
+<br>
 
 ## 🕵️ How to detect if XML-RPC is enabled?
 
@@ -36,7 +35,7 @@ wpscan --url https://target.com --enumerate
 
 If you get a response like `XML-RPC seems to be enabled`, you’re good to go 🚀
 
----
+<br>
 
 ## ⚙️ Features
 
@@ -48,7 +47,7 @@ If you get a response like `XML-RPC seems to be enabled`, you’re good to go �
 - Automatic escape of XML special characters
 - Stop on first success
 
----
+<br>
 
 ## 🚀 Usage
 
@@ -76,17 +75,16 @@ python3 bruteforce.py \
   --stop-on-success
 ```
 
----
-
+<br>
 ## 💡 Tips
 
 - Default `batch` size is 20 — you can go up to 5000+ safely
-- Combine with `--startfrom` for resume
+- Combine with `--startfrom` for resume a previous attack
 - Use `--delay` to avoid triggering WAFs or rate-limits
 - Add Burp with `--proxy http://127.0.0.1:8080` to inspect each call
 - Works great with huge files (14M+ passwords)
 
----
+<br>
 
 ## ⚠️ Legal Disclaimer
 
@@ -94,7 +92,7 @@ This tool is provided for **educational purposes** only.
 Do **NOT** use it on websites you do not own or have explicit permission to test.  
 The author is not responsible for any misuse or damage caused.
 
----
+<br>
 
 ## 📦 License
 
