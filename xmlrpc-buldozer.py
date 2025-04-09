@@ -85,8 +85,6 @@ def parse_response(xml, passwords):
         if idx < len(chunks) and "faultCode" not in chunks[idx]:
             print(f"[✅] SUCCESS → {USERNAME}:{pw}")
             return True
-        else:
-            print(f"[❌] FAILED → {USERNAME}:{pw}")
     return False
 
 # === MULTICALL BATCH SENDER ===
