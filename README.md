@@ -1,10 +1,10 @@
 # 🐍 XML-RPC Buldozer
 <br>
 
-Bruteforce WordPress like a buldozer 🚜 — using the power of `system.multicall`.
+Bruteforce WordPress like a buldozer 🚜 — using the power of `system.multicall`. 
 
 <br>
-By abusing the XML-RPC endpoint, this tool can test thousands of passwords per request, making bruteforcing stealthier and faster than traditional HTTP POST login attempts.
+You found an XML-RPC endpoints on WordPress that expose XML-RPC "multicall" endpoints ? Brute force any user with this tool !By abusing the XML-RPC endpoint, this tool can test thousands of passwords per request, making bruteforcing stealthier and faster than traditional HTTP POST login attempts.
 
 <br>
 
