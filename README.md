@@ -1,25 +1,35 @@
 # 🐍 XML-RPC Buldozer
 <br>
+
 Bruteforce WordPress like a tank 🚜 — using the power of `system.multicall`.
+
 <br>
 By abusing the XML-RPC endpoint, this tool can test thousands of passwords per request, making bruteforcing stealthier and faster than traditional HTTP POST login attempts.
+
 <br>
 
 ## 🚀 Usage
 
 <br>
+
 ```bash
 python3 bruteforce.py --user <username> --wordlist <file> [OPTIONS]
 ```
 <br>
+
 ### ✅ Basic Example
+
 <br>
+
 ```bash
 python3 bruteforce.py --user admin --wordlist rockyou.txt
 ```
 <br>
+
 ### ✅ Full Example
+
 <br>
+
 ```bash
 python3 bruteforce.py \
   --user admin \
